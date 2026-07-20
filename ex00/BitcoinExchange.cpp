@@ -8,22 +8,20 @@ BitcoinExchange::BitcoinExchange(){}
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange& copy) : _content(copy._content){}
 
-BitcoinExchange::BitcoinExchange(std::map<std::string, double> content) : _content(content) {}
-
 BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& other){
 	if (this != &other)
 		this->_content = other._content;
 	return (*this);
 }
 
-void BitcoinExchange::loadData(std::string file)
+int BitcoinExchange::loadData(std::string file)
 {
 	std::ifstream fs(file.c_str());
 
 	if (!fs.is_open())
 	{
 		std::cerr << "Error: could not open file" << std::endl;
-		return;
+		return -1;
 	}
 
 	std::string line;
@@ -43,6 +41,7 @@ void BitcoinExchange::loadData(std::string file)
 		double money = std::strtod(value.c_str(), NULL);
 		_content.insert(std::make_pair(date, money));
 	}
+	return 0;
 }
 
 static std::string trim(std::string str){
@@ -73,7 +72,6 @@ static bool validDate(std::string str){
 	int day = std::atoi(str.substr(8,2).c_str());
 
 	struct tm date = {};
-	// y - 1900 a cause du format convention de tm
 	date.tm_year = year - 1900;
 	date.tm_mon = month - 1;
 	date.tm_mday = day;
@@ -85,8 +83,7 @@ static bool validDate(std::string str){
 
 	return true;
 }
-
-void	BitcoinExchange::extractInput(std::string file){
+void BitcoinExchange::extractInput(std::string file){
 	std::ifstream fs(file.c_str());
 
 	if (!fs.is_open())
@@ -103,7 +100,7 @@ void	BitcoinExchange::extractInput(std::string file){
 
 		if (pos == std::string::npos)
 		{
-			std::cout << "Error: bad input => " << line << std::endl;
+			std::cerr << "Error: bad input => " << line << std::endl;
 			continue;
 		}
 
@@ -142,7 +139,6 @@ void	BitcoinExchange::extractInput(std::string file){
 		std::map<std::string, double>::iterator it;
 
 		it = _content.lower_bound(inputDate);
-
 		if (it == _content.end() || it->first != inputDate)
 		{
 			if (it == _content.begin())
@@ -152,9 +148,7 @@ void	BitcoinExchange::extractInput(std::string file){
 			}
 			--it;
 		}
-
 		double result = value * it->second;
-
 		std::cout << inputDate << " => " << value << " = " << result << std::endl;
 	}
 }

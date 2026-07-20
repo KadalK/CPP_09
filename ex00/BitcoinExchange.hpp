@@ -3,7 +3,6 @@
 
 #include <map>
 #include <iostream>
-#include <exception>
 
 class BitcoinExchange{
 private:
@@ -11,11 +10,10 @@ private:
 public:
 	BitcoinExchange();
 	BitcoinExchange(const BitcoinExchange& copy);
-	BitcoinExchange(std::map<std::string, double> content);
 	BitcoinExchange& operator=(const BitcoinExchange& other);
 
+	int	loadData(std::string file);
 	void	extractInput(std::string file);
-	void	loadData(std::string file);
 
 	~BitcoinExchange();
 };

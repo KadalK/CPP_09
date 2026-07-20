@@ -8,7 +8,8 @@ int main(int ac, char ** av)
 		return -1;
 	}
 	BitcoinExchange btc;
-	btc.loadData("data.csv");
+	if (btc.loadData("data.csv") == -1)
+		return -1;
 	btc.extractInput(av[1]);
 
 	return (0);
