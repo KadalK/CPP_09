@@ -12,9 +12,7 @@ BitcoinExchange::BitcoinExchange(std::map<std::string, double> content) : _conte
 
 BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& other){
 	if (this != &other)
-	{
 		this->_content = other._content;
-	}
 	return (*this);
 }
 
@@ -43,7 +41,6 @@ void BitcoinExchange::loadData(std::string file)
 			continue;
 
 		double money = std::strtod(value.c_str(), NULL);
-		// std::cout << "DEBUG " << date << " -> " << money << std::endl;
 		_content.insert(std::make_pair(date, money));
 	}
 }
@@ -58,7 +55,7 @@ static std::string trim(std::string str){
 	return str.substr(start, end - start + 1);
 }
 
-static bool valideDate(std::string str){
+static bool validDate(std::string str){
 	if (str.length() != 10)
 		return false;
 	if (str[4] != '-' || str[7] != '-')
@@ -116,7 +113,7 @@ void	BitcoinExchange::extractInput(std::string file){
 		if (inputDate == "date")
 			continue;
 
-		if (!valideDate(inputDate))
+		if (!validDate(inputDate))
 		{
 			std::cerr << "Error: date is invalid." << std::endl;
 			continue;
@@ -133,12 +130,12 @@ void	BitcoinExchange::extractInput(std::string file){
 
 		if (value < 0)
 		{
-			std::cout << "Error: not a positive number." << std::endl;
+			std::cerr << "Error: not a positive number." << std::endl;
 			continue;
 		}
 		if (value > 1000)
 		{
-			std::cout << "Error: too large a number." << std::endl;
+			std::cerr << "Error: too large a number." << std::endl;
 			continue;
 		}
 
