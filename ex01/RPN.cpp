@@ -13,61 +13,63 @@ RPN RPN::operator=(const RPN& other){
 	return (*this);
 }
 
-
 void RPN::initStack(std::string content){
 	for (size_t i = 0; i < content.size(); i++)
 	{
+		if (!isdigit(content[i]) && content[i] != '+' && content[i] != '-' && content[i] != '*' && content[i] != '/' && content[i] != ' ')
+		{
+			throw std::runtime_error("Invalid argument");
+		}
+		if (content[i] == ' ')
+			i++;
 		if (content[i] == '+' || content[i] == '-' || content[i] == '*' || content[i] == '/')
+		{
 			_op = content[i];
+			if (_stack.size() >= 2)
+				calculator();
+			else
+				throw std::runtime_error("Invalid argument");
+		}
 		if (isdigit(content[i]))
-			_stack.push(content[i]);
+			_stack.push(content[i] - '0');
 	}
 }
 
-void RPN::calculator()
-{
+void RPN::calculator(){
 	int right;
 	int left;
-	int result;
-
-	right = _stack.top() - '0';
+	right = _stack.top();
 	_stack.pop();
 
-	left = _stack.top() - '0';
+	left = _stack.top();
 	_stack.pop();
 
-	std::cout << "DEBUG " << left << std::endl;
-	std::cout << "DEBUG " << right << std::endl;
 	switch (_op)
 	{
 	case '+':
-		result = left + right;
+		left += right;
 		break;
 	case '-':
-		result = left - right;
+		left -= right;
 		break;
 	case '*':
-		result = left * right;
+		left *= right;
 		break;
 	case '/':
 		if (right == 0)
 			throw std::runtime_error("division by zero");
-		result = left / right;
+		left /= right;
 		break;
 	default:
 		throw std::runtime_error("unknown op");
 	}
-
-	_stack.push(result);
+	_stack.push(left);
 }
 
 void RPN::printResult(){
 	if (_stack.size() != 1)
-		throw std::runtime_error("invalid expression");
-
+		throw std::runtime_error("error");
 	std::cout << _stack.top() << std::endl;
 }
-
-
 
 RPN::~RPN(){}
