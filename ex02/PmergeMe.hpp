@@ -4,46 +4,58 @@
 #include <vector>
 #include <deque>
 #include <iostream>
+#include <memory>
 
-class PmergeMe{
+template < template <typename, typename> class Container >
+class PmergeMe
+{
 private:
-private:
+
+	typedef Container<unsigned int, std::allocator<unsigned int> > Vec;
+	typedef Container<Vec, std::allocator<Vec> > Groups;
+
 	int _rest;
 	bool _asRest;
-	unsigned int _groupSize;
-	std::vector<unsigned int> _input;
-	std::vector<unsigned int> _sorted;
-	std::vector<std::vector<unsigned int> > _pending;
-	std::vector<std::vector<unsigned int> > _groups;
+
+	Vec _input;
+	Vec _sorted;
+
+	Groups _groups;
+	Groups _pending;
+
 public:
+
 	PmergeMe();
 	PmergeMe(const PmergeMe& copy);
 	PmergeMe& operator=(const PmergeMe& other);
 
-	//debug func
-	void    DebugPrintContain();
-	void	DebugPrintSorted();
-	void	DebugPrintPending();
+	void printInput();
+	void printSorted();
 
-	//init
-	void    initContainer(int ac, char **av);
-	void    initGroups();
-	void    initMain();
-	void    initPending();
-	// void	run();
-	void    init(int ac, char **av);
+	void initContainer(int ac, char **av);
+	void initGroups();
+	void initMain();
+	void initPending();
+
+	void init(int ac, char **av);
+
 	void sortGroups();
 
-	void	recursiveSort(std::vector<std::vector <unsigned int> >& v);
-	void	mergeGroups(std::vector<std::vector<unsigned int> >& v);
-	size_t binarySearch(unsigned int value, size_t limit);
-	std::vector<size_t> generateJacobsthalOrder(size_t size);
-	size_t findPosition(unsigned int value);
-	void	insertPending();
-	void run();
+	void recursiveSort(Groups& v);
+	void mergeGroups(Groups& v);
 
+	size_t binarySearch(unsigned int value, size_t limit);
+
+	std::vector<size_t> generateJacobsthalOrder(size_t size);
+
+	size_t findPosition(unsigned int value);
+
+	void insertPending();
+
+	void run(std::string type);
 
 	~PmergeMe();
 };
 
+#include "PmergeMe.tpp"
 #endif
