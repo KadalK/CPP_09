@@ -1,13 +1,19 @@
 #include "PmergeMe.hpp"
 
-int main(int ac, char **av){
+#include <iostream>
+
+int main(int ac, char **av)
+{
 	if (ac < 2)
-		return -1;
+	{
+		std::cout << "Usage: ./PmergeMe numbers..." << std::endl;
+		return 1;
+	}
 
-	PmergeMe p;
+	PmergeMe pmerge;
 
-	p.init(ac, av);
-	p.DebugPrintContain();
-	p.DebugPrintSorted();
-	p.DebugPrintPending();
+	pmerge.init(ac, av);
+	pmerge.run();
+
+	return 0;
 }

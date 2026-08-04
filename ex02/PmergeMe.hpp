@@ -5,19 +5,16 @@
 #include <deque>
 #include <iostream>
 
-struct Pair{
-	unsigned int small;
-	unsigned int big;
-};
-
 class PmergeMe{
+private:
 private:
 	int _rest;
 	bool _asRest;
+	unsigned int _groupSize;
 	std::vector<unsigned int> _input;
-	std::vector<Pair> _pairs;
-	std::vector<unsigned int> _pending;
 	std::vector<unsigned int> _sorted;
+	std::vector<std::vector<unsigned int> > _pending;
+	std::vector<std::vector<unsigned int> > _groups;
 public:
 	PmergeMe();
 	PmergeMe(const PmergeMe& copy);
@@ -30,12 +27,21 @@ public:
 
 	//init
 	void    initContainer(int ac, char **av);
-	void    initPairs();
-	void    initSorted();
+	void    initGroups();
+	void    initMain();
 	void    initPending();
+	// void	run();
 	void    init(int ac, char **av);
+	void sortGroups();
 
-	void    sortBigPairs();
+	void	recursiveSort(std::vector<std::vector <unsigned int> >& v);
+	void	mergeGroups(std::vector<std::vector<unsigned int> >& v);
+	size_t binarySearch(unsigned int value, size_t limit);
+	std::vector<size_t> generateJacobsthalOrder(size_t size);
+	size_t findPosition(unsigned int value);
+	void	insertPending();
+	void run();
+
 
 	~PmergeMe();
 };
