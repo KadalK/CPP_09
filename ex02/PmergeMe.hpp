@@ -41,7 +41,9 @@ public:
 
 	void sortGroups();
 
+	void recursiveSortBigs(Vec& v);
 	void recursiveSort(Groups& v);
+	void merge(Vec& left, Vec& right, Vec& result);
 	void mergeGroups(Groups& v);
 
 	size_t binarySearch(unsigned int value, size_t limit);
