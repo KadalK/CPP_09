@@ -4,7 +4,7 @@ CFLAGS = -Wall -Wextra -Werror -std=c++98 -g3
 
 SRCS =	main.cpp
 
-INCS =	PmergeMe.hpp
+INCS =	PmergeMe.hpp PmergeMe.tpp
 
 $(NAME): $(SRCS) $(INCS) Makefile
 	$(CPP) $(CFLAGS) $(SRCS) -o $(NAME)
