@@ -34,14 +34,40 @@ PmergeMe<Container>& PmergeMe<Container>::operator=(const PmergeMe& other){
 	return (*this);
 }
 
+
+//PRINT
 template <template <typename, typename > class Container>
-void PmergeMe<Container>::printamere(){
+void PmergeMe<Container>::printGroups(){
 	std::cout << "_groups" << std::endl;
 	for (size_t i = 0; i < _groups.size(); i++)
 	{
-		std::cout << _groups[i].front() << std::endl;
-		std::cout << _groups[i].back() << std::endl;
+		for (size_t j = 0; j < _groups[i].size(); j++)
+		{
+			std::cout << _groups[i][j] << " ";
+
+		}
 	}
+	std::cout << std::endl;
+}
+
+template <template <typename, typename > class Container>
+void PmergeMe<Container>::printRest(){
+	std::cout << "_rest" << std::endl;
+	for (size_t i = 0; i < _rest.size(); i++)
+	{
+			std::cout << _rest[i] << " ";
+	}
+	std::cout << std::endl;
+}
+
+template <template <typename, typename > class Container>
+void PmergeMe<Container>::printPending(){
+	std::cout << "_pending" << std::endl;
+	for (size_t i = 0; i < _pending.size(); i++)
+	{
+		std::cout << _pending[i] << " ";
+	}
+	std::cout << std::endl;
 }
 
 inline bool isNumber(char *str){
@@ -60,6 +86,8 @@ inline bool isNumber(char *str){
 	return true;
 }
 
+
+//INIT
 template <template <typename, typename > class Container>
 void PmergeMe<Container>::initContainer(int ac, char **av){
 	for (int i = 1; i < ac; i++)
@@ -88,8 +116,8 @@ void PmergeMe<Container>::initGroups(){
 		group.push_back(_input[i]);
 		group.push_back(_input[i + 1]);
 
-		// if (group[0] > group[1])
-		// 	std::swap(group[0], group[1]);
+		if (group[0] > group[1])
+			std::swap(group[0], group[1]);
 
 		_groups.push_back(group);
 	}
@@ -100,64 +128,37 @@ void PmergeMe<Container>::initGroups(){
 		_rest.push_back(_input.back());
 	}
 
-	sortBigs(_groups);
+	recursiveUp(_groups);
 }
 
-//TO REWORK (adapter aux groupes de taille variable)
 template <template <typename, typename > class Container>
-void PmergeMe<Container>::initMain(){
+void PmergeMe<Container>::initMain()
+{
 	_sorted.clear();
 
 	if (_groups.empty())
 		return;
 
-	for (size_t i = 0; i < _groups.size(); i++)
-		_sorted.push_back(_groups[i][1]);
+	_sorted.push_back(_groups[0]);
 
-	_sorted.insert(_sorted.begin(), _groups[0][0]);
+	for (size_t i = 2; i < _groups.size(); i += 2)
+		_sorted.push_back(_groups[i]);
 }
 
 //TO REWORK (insertion de groupes au lieu de simples valeurs)
 template <template <typename, typename > class Container>
-void PmergeMe<Container>::initPending(){
+void PmergeMe<Container>::initPending()
+{
 	_pending.clear();
 
-	for (size_t i = 1; i < _groups.size(); i++)
+	for (size_t i = 1; i < _groups.size(); i += 2)
 		_pending.push_back(_groups[i]);
 }
-
-
-
-// template <template <typename, typename > class Container>
-// void PmergeMe<Container>::merge(Vec& left, Vec& right, Vec& result){
-// 	Vec tmp;
-//
-// 	size_t i = 0;
-// 	size_t j = 0;
-//
-// 	while (i < left.size() && j < right.size())
-// 	{
-// 		if (left[i] <= right[j])
-// 			tmp.push_back(left[i++]);
-// 		else
-// 			tmp.push_back(right[j++]);
-// 	}
-//
-// 	while (i < left.size())
-// 		tmp.push_back(left[i++]);
-//
-// 	while (j < right.size())
-// 		tmp.push_back(right[j++]);
-//
-// 	result = tmp;
-// }
-
 
 template <template <typename, typename > class Container>
 Container<unsigned int, std::allocator<unsigned int> > PmergeMe<Container>::merge(Vec& left, Vec& right){
 	Vec tmp;
 
-	std::cout << "ICI\n";
 	for (size_t i = 0; i < left.size(); i++)
 	{
 		tmp.push_back(left[i]);
@@ -167,127 +168,92 @@ Container<unsigned int, std::allocator<unsigned int> > PmergeMe<Container>::merg
 		tmp.push_back(right[i]);
 	}
 
-	for (size_t i = 0; i < tmp.size(); i++)
-	{
-		std::cout << "tmp[i] : " << tmp[i] << '\n';
-	}
 	return tmp;
 }
 
+
+//SPLIT
 template <template <typename, typename > class Container>
-void PmergeMe<Container>::splitGroups(Groups &g){
-	Groups tmp;
+void PmergeMe<Container>::splitGroups(Groups& g, Groups& left, Groups& right){
+	if (g.empty() || g[0].size() <= 1)
+		return;
 
 	size_t pairSize = g[0].size() / 2;
 
 	for (size_t i = 0; i < g.size(); i++)
 	{
-		Vec left;
-		Vec right;
+		Vec l;
+		Vec r;
 
-		for (size_t j = 0; j  < pairSize; j++)
+		for (size_t j = 0; j < pairSize; j++)
 		{
-			left.push_back(g[i][j]);
-			right.push_back(g[i][j + pairSize]);
+			l.push_back(g[i][j]);
+			r.push_back(g[i][j + pairSize]);
 		}
-		tmp.push_back(left);
-		tmp.push_back(right);
+
+		left.push_back(l);
+		right.push_back(r);
 	}
-	g = tmp;
 }
 
 
 //TO REWORK (delete ?)
 template <template <typename, typename > class Container>
-void PmergeMe<Container>::sortBigs(Groups& g){
-	// printamere();
-	// if (g.size() <= 3)
-	// {
-	// 	return;
-	// }
-
+void PmergeMe<Container>::recursiveUp(Groups& g){
+	printRest();
 	Groups tmp;
-	size_t indexTmp = 0;
 
 	for (size_t i = 0; i < g.size(); i+= 2)
 	{
 		if (i + 1 >= g.size())
 		{
-			// for (size_t j = 0; i < g.size() - _input.size(); i++)
-			// {
-			// 	_input[j]
-			// }
-			tmp.push_back(_groups[i]);
-			_groups = tmp;
-			return;
+			sort(g[i].begin(), g[i].end());
+			tmp.push_back(g[i]);
+			break;
 		}
 		if (g[i].back() > g[i + 1].back())
 		{
 			std::swap(g[i], g[i + 1]);
 		}
-		std::cout << "g.size() = " << g.size() << "\n";
-		std::cout << "_input.size() = " << _input.size()<< "\n";
-		// if (g.begin()->size() * 2 < _input.size())
-		// {
-			// for (size_t i = 0; i < g.size() * 2 < _input.size(); i++)
-			// {
-			//
-			// }
-			Vec left = g[i];
-			Vec right = g[i + 1];
-			tmp.push_back(merge(left, right));
-			indexTmp++;
-		// }
-		// else
-		// {
-		// 	// for (size_t i = )
-		// 	_groups = tmp;
-		// 	return;
-		// }
-		// indexTmp++
+
+		Vec left = g[i];
+		Vec right = g[i + 1];
+
+		std::cout << std::endl;
+		tmp.push_back(merge(left, right));
+
 	}
-	if (g.begin()->size() * 2 < _input.size())
-		sortBigs(tmp);
-	else
+	if (tmp.size() > 1)
 	{
-		_groups = tmp;
-		return ;
+		recursiveUp(tmp);
+		printGroups();
+		return;
 	}
+	_groups = tmp;
 }
 
 // template <template <typename, typename > class Container>
-// void PmergeMe<Container>::recursiveSortUp(Groups& v){
+// void PmergeMe<Container>::recursiveDownUp(Groups& v){
 //
 // }
 
 //TO REWORK (A REFAIRE COMPLETEMENT)
 template <template <typename, typename > class Container>
-void PmergeMe<Container>::recursiveSort(Groups& v){
-	if (v.size() < 2)
+void PmergeMe<Container>::recursiveDown(Groups& g){
+	if (g[0].size() == 1)
 		return;
 
-	Vec bigs;
+	Groups left;
+	Groups right;
 
-	for (size_t i = 0; i < v.size(); i++)
-		bigs.push_back(v[i].back());
+	split(g, left, right);
 
-	recursiveSortBigs(bigs);
+	recursiveDown(left);
+	recursiveDown(right);
 
-	Groups ordered;
-
-	for (size_t i = 0; i < bigs.size(); i++)
-	{
-		for (size_t j = 0; j < v.size(); j++)
-		{
-			if (v[j].back() == bigs[i])
-			{
-				ordered.push_back(v[j]);
-				break;
-			}
-		}
-	}
-
-	v = ordered;
+	// ici :
+	// créer main/pending
+	// insertion Jacobsthal
 }
 
 template <template <typename, typename > class Container>
@@ -383,14 +349,19 @@ void PmergeMe<Container>::run(std::string type)
 
 	clock_t start = clock();
 
-	recursiveSort(_groups);
-
+	initMain();
+	initPending();
 	insertPending();
+	recursiveDown(_groups);
 
 	if (_asRest)
 	{
-		size_t pos = binarySearch(_rest, _sorted.size());
-		_sorted.insert(_sorted.begin() + pos, _rest);
+		size_t i = 0;
+		while (_rest[i])
+		{
+			size_t pos = binarySearch(_rest[i], _sorted.size());
+			_sorted.insert(_sorted.begin() + pos, _rest[i]);
+		}
 	}
 
 	clock_t end = clock();
@@ -431,3 +402,5 @@ void PmergeMe<Container>::printSorted(){
 
 template <template <typename, typename > class Container>
 PmergeMe<Container>::~PmergeMe(){}
+
+//inserer tout la logic du recusiveDown, en y insert les elements dans l'ordre de jacobjacob

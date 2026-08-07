@@ -33,5 +33,6 @@
 int main(int ac, char **av){
 	PmergeMe<std::vector> vectorSort;
 	vectorSort.init(ac, av);
+	vectorSort.run("std::vector");
 
 }

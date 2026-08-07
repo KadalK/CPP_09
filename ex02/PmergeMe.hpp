@@ -30,7 +30,10 @@ public:
 	PmergeMe(const PmergeMe& copy);
 	PmergeMe& operator=(const PmergeMe& other);
 
-	void printamere();
+	void printGroups();
+	void printRest();
+	void printPending();
+	// void printSorted();
 
 	void initContainer(int ac, char **av);
 	void initGroups();
@@ -38,11 +41,11 @@ public:
 	void initPending();
 	void init(int ac, char **av);
 
-	// void recursiveSortBigs(Vec& v);
-	void sortBigs(Groups& g);
-	void recursiveSort(Groups& v);
+	// void recursiveDownBigs(Vec& v);
+	void recursiveUp(Groups& g);
+	void recursiveDown(Groups& g);
 	Vec merge(Vec& left, Vec& right);
-	void splitGroups(Groups &g);
+	void splitGroups(Groups& g, Groups& left, Groups& right);
 
 	size_t binarySearch(unsigned int value, size_t limit);
 	std::vector<size_t> generateJacobsthalOrder(size_t size);
