@@ -22,6 +22,7 @@ private:
 	Vec _stash;
 
 	Groups _groups;
+	Groups _main;
 	Groups _pending;
 
 public:
@@ -45,9 +46,10 @@ public:
 	void recursiveUp(Groups& g);
 	void recursiveDown(Groups& g);
 	Vec merge(Vec& left, Vec& right);
-	void splitGroups(Groups& g, Groups& left, Groups& right);
+	Groups splitGroups(Groups& g);
 
 	size_t binarySearch(unsigned int value, size_t limit);
+	size_t binarySearchGroup(const Groups& groups, const Vec& block, size_t limit);
 	std::vector<size_t> generateJacobsthalOrder(size_t size);
 	size_t findPosition(unsigned int value);
 	void insertPending();
