@@ -132,28 +132,28 @@ void PmergeMe<Container>::initGroups(){
 }
 
 template <template <typename, typename > class Container>
-void PmergeMe<Container>::initMain(){
+void PmergeMe<Container>::initMain(Groups& g){
 	_main.clear();
 
-	if (_groups.empty())
+	if (g.empty())
 		return;
 
-	_main.push_back(_groups[0]);
+	_main.push_back(g[0]);
 
-	for (size_t i = 2; i < _groups.size(); i += 2)
-		_main.push_back(_groups[i]);
+	for (size_t i = 2; i < g.size(); i += 2)
+		_main.push_back(g[i]);
 }
 
 //TO REWORK (insertion de groupes au lieu de simples valeurs)
 template <template <typename, typename > class Container>
-void PmergeMe<Container>::initPending()
+void PmergeMe<Container>::initPending(Groups& g)
 {
 	_pending.clear();
 
-	for (size_t i = 1; i < _groups.size(); i++)
+	for (size_t i = 1; i < g.size(); i++)
 	{
 		if (i % 2 != 0)
-            _pending.push_back(_groups[i]);
+            _pending.push_back(g[i]);
 	}
 }
 
@@ -264,9 +264,9 @@ void PmergeMe<Container>::recursiveDown(Groups& g)
 		return;
 
 	Groups tmp = splitGroups(g);
-	initMain(tmp);
-	initPending(tmp);
-	insertPending(tmp);
+	initMain(g);
+	initPending(g);
+	insertPending();
 
 	recursiveDown(g);
 
@@ -279,6 +279,7 @@ size_t PmergeMe<Container>::binarySearch(unsigned int value, size_t limit){
 
 	while (left < right)
 	{
+		std::cout << "lala\n";
 		size_t mid = (left + right) / 2;
 
 		if (_sorted[mid] < value)
@@ -384,9 +385,6 @@ void PmergeMe<Container>::run(std::string type)
 
 	clock_t start = clock();
 
-	initMain();
-	initPending();
-	insertPending();
 	recursiveDown(_groups);
 
 	if (_asRest)

@@ -38,8 +38,8 @@ public:
 
 	void initContainer(int ac, char **av);
 	void initGroups();
-	void initMain();
-	void initPending();
+	void initMain(Groups& g);
+	void initPending(Groups& g);
 	void init(int ac, char **av);
 
 	// void recursiveDownBigs(Vec& v);
