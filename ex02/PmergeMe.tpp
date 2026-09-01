@@ -194,8 +194,9 @@ PmergeMe<Container>::splitGroups(Groups& g, size_t pairSize){
 		}
 	}
 
-	printWhatever(tmp);
-	std::cout << '\n';
+	// printWhatever(tmp);
+	// std::cout << '\n';
+	_groups = tmp;
 	return tmp;
 }
 
@@ -245,54 +246,66 @@ void PmergeMe<Container>::recursiveDown(Groups& g, size_t pairSize){
 	Groups tmp = splitGroups(g, pairSize);
 
 
-
 	initMain(tmp);
 	initPending(tmp);
 	printMain();
 	std::cout <<'\n';
 	printPending();
 	std::cout <<'\n';
-	printWhatever(_stash);
-	std::cout <<'\n';
+	// printWhatever(_stash);
+	// std::cout <<'\n';
+	std::cout << "before : \n";
+	printGroups();
 	insertPending(_pending);
+	_groups = _main;
+	for (size_t i = 0; i < _stash.size();i++)
+		_groups.push_back(_stash[i]);
+	std::cout << "after : \n";
+	printGroups();
+	std::cout <<'\n';
 
-	recursiveDown(tmp, pairSize / 2);
-	g = tmp;
+	recursiveDown(_groups, pairSize / 2);
 }
 
-template <template <typename, typename > class Container>
-size_t PmergeMe<Container>::binarySearch(unsigned int value, size_t limit){
-	size_t left = 0;
-	size_t right = limit;
-
-	while (left < right)
-	{
-		size_t mid = (left + right) / 2;
-
-		if (_sorted[mid] < value)
-			left = mid + 1;
-		else
-			right = mid;
-	}
-	return left;
-}
+// template <template <typename, typename > class Container>
+// size_t PmergeMe<Container>::binarySearch(unsigned int value, size_t limit){
+// 	size_t left = 0;
+// 	size_t right = limit;
+//
+// 	while (left < right)
+// 	{
+// 		size_t mid = (left + right) / 2;
+//
+// 		if (_sorted[mid] < value)
+// 			left = mid + 1;
+// 		else
+// 			right = mid;
+// 	}
+// 	return left;
+// }
 
 template <template <typename, typename > class Container>
 size_t PmergeMe<Container>::binarySearchGroup( const Groups& main, const Vec& pend, size_t limit){
 	size_t left = 0;
-	size_t right = limit;
-
+	// (void)limit;
+	size_t right = limit; //debug;
+	// size_t right = main.size();
 	while (left < right)
 	{
 		size_t mid = (left + right) / 2;
-		// mid += (left + right) % 2;
 
 		if (main[mid].back() < pend.back()) //seg
+		{
 			left = mid + 1;
-		else
-			right = mid;
-	}
+		}
+		else if (main[mid].back() > pend.back())
+		{
 
+			right = mid;
+		}
+		// else
+		// 	return right;
+	}
 	return left;
 }
 
@@ -301,23 +314,17 @@ template <template <typename, typename> class Container>
 std::vector<size_t> PmergeMe<Container>::generateJacobsthalOrder(size_t size){
 	std::vector<size_t> order;
 
-	size_t n1 = 1;
-	size_t n2 = 3;
+	size_t n1 = 0; //changed  1 / 3 to 0 / 1
+	size_t n2 = 1;
 
 	while (n2 < size)
 	{
-		for (size_t i = n2; i > n1; i--)
-			order.push_back(i - 1);
-
-		size_t next = n2 + 2 * n1;
+		size_t next = n1 * 2 + n2;
 
 		n1 = n2;
 		n2 = next;
+        order.push_back(next);
 	}
-
-	for (size_t i = size; i > n1; i--)
-		order.push_back(i - 1);
-
 	return order;
 }
 
@@ -334,25 +341,44 @@ size_t PmergeMe<Container>::findPosition(unsigned int value)
 }
 
 template <template <typename, typename > class Container>
-void PmergeMe<Container>::insertPending(Groups& g)
-{
+void PmergeMe<Container>::insertPending(Groups& g){ //to fix
     if (g.empty())
         return;
 
-    std::vector<size_t> order = generateJacobsthalOrder(g.size()); //to change
-	std::cout << "pending size = " << g.size() << std::endl;
+    std::vector<size_t> order = generateJacobsthalOrder(_main.size() + _pending.size()); //to change
+	for (size_t i = 0; i < order.size(); i++)
+		std::cout << "order[i] = " << order[i] << std::endl;
 
-    for (size_t i = 0; i < order.size(); i++)
+    // for (size_t i = 1; i < order.size(); i++)
+    for (size_t i = 0; i < g.size(); )
     {
         size_t index = order[i];
-        size_t limit = index + 1;
+        size_t limit = index;
+		size_t tmp = order[i];
 
-        if (limit > _main.size())
-            limit = _main.size();
+    	while (tmp >= order[i - 1])
+    	{
+    		// std::cout << "2\n";
 
-        size_t pos = binarySearchGroup(_main, g[index], limit);
+    		if (limit > _main.size())
+    			limit = _main.size();
 
-		_main.insert(_main.begin() + pos, g[index]);
+    		// std::cout << "g.size() : " << g.size() << '\n';
+    		if (tmp > g.size())
+    			--tmp;
+    		else
+    		{
+    			std::cout << "else tmp : " << tmp << '\n';
+    			size_t pos = binarySearchGroup(_main, g[tmp - 1], limit);
+    			std::cout << "else pos : " << pos << '\n';
+
+    			_main.insert(_main.begin() + pos, g[tmp - 1]);
+    			// if (tmp == order[i - 1])
+    			// 	break ;
+    			--tmp;
+    		}
+    	}
+    	i++;
     }
 }
 
@@ -385,7 +411,7 @@ void PmergeMe<Container>::run(std::string type){
 
 	clock_t end = clock();
 
-	printSorted();
+	printGroups();
 
 	double us = static_cast<double>(end - start)
 		* 1000000.0 / CLOCKS_PER_SEC;
