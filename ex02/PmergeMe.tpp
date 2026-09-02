@@ -188,15 +188,17 @@ PmergeMe<Container>::splitGroups(Groups& g, size_t pairSize){
 
 		for (size_t j = pairSize; j < g[i].size(); j++)
 		{
-			Vec rest;
-			rest.push_back(g[i][j]);
-			tmp.push_back(rest);
+			_asRest = true;
+			_rest.push_back(g[i][j]);
+			tmp.push_back(_rest);
 		}
 	}
 
 	// printWhatever(tmp);
 	// std::cout << '\n';
 	_groups = tmp;
+	printGroups();
+	// std::cout << '\n';
 	return tmp;
 }
 
@@ -244,7 +246,12 @@ void PmergeMe<Container>::recursiveDown(Groups& g, size_t pairSize){
 	// printGroups();
 
 	Groups tmp = splitGroups(g, pairSize);
-
+	std::cout << "after split : " << '\n';
+	printGroups();
+	std::cout  << '\n';
+	std::cout << "rest: " << '\n';
+	printRest();
+	std::cout  << '\n';
 
 	initMain(tmp);
 	initPending(tmp);
@@ -263,6 +270,7 @@ void PmergeMe<Container>::recursiveDown(Groups& g, size_t pairSize){
 		_groups.push_back(_stash[i]);
 	std::cout << "after : \n";
 	printGroups();
+	printSorted();
 	std::cout <<'\n';
 
 	recursiveDown(_groups, pairSize / 2);
@@ -303,7 +311,6 @@ size_t PmergeMe<Container>::binarySearchGroup( const Groups& main, const Vec& pe
 
 	while ((right - left) > 1)
 	{
-
 		// std::cout << "DEBUG main[mid].back & pend.back() " << main[mid].back() << " | " << pend.back() << "\n";
 		mid = (left + right) / 2;
 		mid += (left + right) % 2;
@@ -326,13 +333,18 @@ size_t PmergeMe<Container>::binarySearchGroup( const Groups& main, const Vec& pe
 	}
 	// if (left == 0)
 	// 	return 0;
-	std::cout << "left right : " << left << ' ' << right << '\n';
-	std::cout << "main[left].back()" << main[left].back() << std::endl;
-	std::cout << "pend.back()" << pend.back() << std::endl;
+	// std::cout << "left right : " << left << ' ' << right << '\n';
+	// std::cout << "main[left].back()" << main[left].back() << std::endl;
+	// std::cout << "pend.back()" << pend.back() << std::endl;
+	if (left <= 0)
+		return 0;
 	if (main[left].back() > pend.back())
 	{
 		return left;
 	}
+	// if (left + 1 < main.size())
+	// std::cout << "main[left + 1].back()" << main[left + 1].back() << std::endl;
+	// std::cout << "CHALLAH IL RENTRE LA LE 14 " << pend.back() << std::endl;
 	return left + 1;
 }
 
@@ -373,7 +385,7 @@ void PmergeMe<Container>::insertPending(Groups& g){ //to fix
     if (g.empty())
         return;
 
-    std::vector<size_t> order = generateJacobsthalOrder(200); //to change
+    std::vector<size_t> order = generateJacobsthalOrder(5000); //to change
 	for (size_t i = 0; i < order.size(); i++)
 	{
 
