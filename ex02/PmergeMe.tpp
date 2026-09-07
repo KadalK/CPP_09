@@ -53,7 +53,6 @@ inline bool isNumber(char *str){
 }
 
 
-//INIT
 template <template <typename, typename > class Container>
 void PmergeMe<Container>::initContainer(int ac, char **av){
 	for (int i = 1; i < ac; i++)
@@ -124,7 +123,6 @@ void PmergeMe<Container>::initMain(Groups& g){
 	}
 }
 
-//TO REWORK (insertion de groupes au lieu de simples valeurs)
 template <template <typename, typename > class Container>
 void PmergeMe<Container>::initPending(Groups& g){
 	_pending.clear();
@@ -163,7 +161,6 @@ static size_t sizingPair(size_t size){
 	return n;
 }
 
-//SPLIT
 template <template <typename, typename> class Container>
 typename PmergeMe<Container>::Groups
 PmergeMe<Container>::splitGroups(Groups& g, size_t pairSize){
@@ -202,16 +199,11 @@ PmergeMe<Container>::splitGroups(Groups& g, size_t pairSize){
 		}
 	}
 
-	// printWhatever(tmp);
-	// std::cout << '\n';
 	_groups = tmp;
-	// printGroups();
-	// std::cout << '\n';
 	return tmp;
 }
 
 
-//TO REWORK (delete ?)
 template <template <typename, typename > class Container>
 void PmergeMe<Container>::recursiveUp(Groups& g, size_t pairsize){
 	Groups tmp;
@@ -377,42 +369,33 @@ void PmergeMe<Container>::init(int ac, char **av){
 
 template <template <typename, typename > class Container>
 void PmergeMe<Container>::run(std::string type){
+	clock_t start = clock();
 
-	try
-	{
-		clock_t start = clock();
+	printInput();
+	size_t pairSize = sizingPair(_input.size());
 
-		printInput();
-		size_t pairSize = sizingPair(_input.size());
+	recursiveDown(_groups, pairSize);
 
-		recursiveDown(_groups, pairSize);
+	printSorted();
 
-		printSorted();
-
-		clock_t end = clock();
+	clock_t end = clock();
 
 
-		double us = static_cast<double>(end - start)
-			* 1000000.0 / CLOCKS_PER_SEC;
+	double us = static_cast<double>(end - start)
+		* 1000000.0 / CLOCKS_PER_SEC;
 
-		std::cout << "Time to process a range of "
-				  << _input.size()
-				  << " elements with "
-				  << type
-				  << " : "
-				  << us
-				  << " us"
-				  << std::endl;
+	std::cout << "Time to process a range of "
+			  << _input.size()
+			  << " elements with "
+			  << type
+			  << " : "
+			  << us
+			  << " us"
+			  << std::endl;
 
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-	}
 }
 
 
-//print
 template <template <typename, typename > class Container>
 void PmergeMe<Container>::printInput(){
 	std::cout << "Before: ";
