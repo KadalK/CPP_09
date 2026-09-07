@@ -5,6 +5,9 @@
 #include <deque>
 #include <iostream>
 #include <memory>
+#include <climits>
+#include <algorithm>
+#include <ctime>
 
 template < template <typename, typename> class Container >
 class PmergeMe
@@ -32,27 +35,23 @@ public:
 	PmergeMe& operator=(const PmergeMe& other);
 
 
-	// void printSorted();
-
 	void initContainer(int ac, char **av);
 	void initGroups();
 	void initMain(Groups& g);
 	void initPending(Groups& g);
 	void init(int ac, char **av);
 
-	// void recursiveDownBigs(Vec& v);
 	void recursiveUp(Groups& g, size_t pairsize);
 	void recursiveDown(Groups& g, size_t pairSize);
 	Vec merge(Vec& left, Vec& right);
 	Groups splitGroups(Groups& g, size_t pairSize);
 
-	size_t binarySearch(unsigned int value, size_t limit);
 	size_t binarySearchGroup(const Groups& groups, const Vec& block, size_t limit);
 	std::vector<size_t> generateJacobsthalOrder(size_t size);
 	size_t findPosition(unsigned int value);
 	void insertPending(Groups &g);
 
-	void run(std::string type);
+	void run();
 
 	void    printInput();
 	void    printRest();
@@ -60,7 +59,8 @@ public:
 	void    printPending();
 	void    printMain();
 	void    printSorted();
-	void printWhatever(Groups &g);
+	void    printClock(clock_t start, clock_t end, std::string type);
+	void	printWhatever(Groups &g);
 
 	~PmergeMe();
 };

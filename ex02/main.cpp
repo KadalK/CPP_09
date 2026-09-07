@@ -10,16 +10,36 @@ int main(int ac, char **av)
 
 	try
 	{
+		std::cout << "------STD::VECTOR------\n" << std::endl;
+
+		clock_t start = clock();
+
 		PmergeMe<std::vector> vectorSort;
-
 		vectorSort.init(ac, av);
-		vectorSort.run("std::vector");
+		vectorSort.run();
+
+		clock_t end = clock();
+		vectorSort.printClock(start, end, "std::vector");
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+		return 1;
+	}
 
 
-		// PmergeMe<std::deque> dequeSort;
-		//
-		// dequeSort.init(ac, av);
-		// dequeSort.run("std::deque");
+	try
+	{
+
+		std::cout << "\n\n------STD::DEQUE------\n" << std::endl;
+		clock_t start = clock();
+
+		PmergeMe<std::deque> dequeSort;
+		dequeSort.init(ac, av);
+		dequeSort.run();
+
+		clock_t end = clock();
+		dequeSort.printClock(start, end, "std::deque");
 	}
 	catch (std::exception& e)
 	{

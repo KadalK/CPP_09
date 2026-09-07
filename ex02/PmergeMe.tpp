@@ -1,7 +1,4 @@
-#include "PmergeMe.hpp"
-#include <climits>
-#include <algorithm>
-#include <ctime>
+#pragma once
 
 template <template <typename, typename > class Container>
 PmergeMe<Container>::PmergeMe()
@@ -10,14 +7,14 @@ PmergeMe<Container>::PmergeMe()
 
 template <template <typename, typename > class Container>
 PmergeMe<Container>::PmergeMe(const PmergeMe& copy)
-					: _rest(copy._rest),
-					  _asRest(copy._asRest),
-					  _input(copy._input),
-					  _sorted(copy._sorted),
-					  _stash(copy._stash),
-					  _groups(copy._groups),
-					  _main(copy._main),
-					  _pending(copy._pending)
+:						_asRest(copy._asRest),
+						_rest(copy._rest),
+						_input(copy._input),
+						_sorted(copy._sorted),
+						_stash(copy._stash),
+						_groups(copy._groups),
+						_main(copy._main),
+						_pending(copy._pending)
 {}
 
 template <template <typename, typename > class Container>
@@ -36,7 +33,7 @@ PmergeMe<Container>& PmergeMe<Container>::operator=(const PmergeMe& other){
 	return (*this);
 }
 
-inline bool isNumber(char *str){
+inline bool isNumber(const char *str){
 	size_t i = 0;
 
 	if (str[0] == '\0')
@@ -58,24 +55,18 @@ void PmergeMe<Container>::initContainer(int ac, char **av){
 	for (int i = 1; i < ac; i++)
 	{
 		if (!isNumber(av[i]))
-		{
 			throw std::runtime_error("Error");
-		}
 
 		unsigned long value = std::atol(av[i]);
 		if (value > UINT_MAX)
-		{
 			throw std::runtime_error("Error");
-		}
 		if (std::find(_input.begin(), _input.end(), value) != _input.end())
 			throw std::runtime_error("Error");
 
 		_input.push_back(static_cast<unsigned int>(value));
 	}
 	if (_input.size() == 1)
-	{
 		throw std::runtime_error("Error");
-	}
 }
 
 template <template <typename, typename > class Container>
@@ -132,9 +123,7 @@ void PmergeMe<Container>::initPending(Groups& g){
 	for (size_t i = 1; i < g.size(); i++)
 	{
 		if (pairSize != g[i].size())
-		{
 			_stash.push_back(g[i]);
-		}
 		else if (i % 2 == 0)
 			_pending.push_back(g[i]);
 	}
@@ -150,15 +139,6 @@ Container<unsigned int, std::allocator<unsigned int> > PmergeMe<Container>::merg
 		tmp.push_back(right[i]);
 
 	return tmp;
-}
-
-static size_t sizingPair(size_t size){
-	size_t n = 1;
-
-	while (n * 2 <= size)
-		n *= 2;
-
-	return n;
 }
 
 template <template <typename, typename> class Container>
@@ -367,34 +347,24 @@ void PmergeMe<Container>::init(int ac, char **av){
 		initGroups();
 }
 
-template <template <typename, typename > class Container>
-void PmergeMe<Container>::run(std::string type){
-	clock_t start = clock();
+static size_t sizingPair(size_t size){
+	size_t n = 1;
 
+	while (n * 2 <= size)
+		n *= 2;
+
+	return n;
+}
+
+template <template <typename, typename > class Container>
+void PmergeMe<Container>::run(){
 	printInput();
 	size_t pairSize = sizingPair(_input.size());
 
 	recursiveDown(_groups, pairSize);
 
 	printSorted();
-
-	clock_t end = clock();
-
-
-	double us = static_cast<double>(end - start)
-		* 1000000.0 / CLOCKS_PER_SEC;
-
-	std::cout << "Time to process a range of "
-			  << _input.size()
-			  << " elements with "
-			  << type
-			  << " : "
-			  << us
-			  << " us"
-			  << std::endl;
-
 }
-
 
 template <template <typename, typename > class Container>
 void PmergeMe<Container>::printInput(){
@@ -424,10 +394,7 @@ void PmergeMe<Container>::printGroups(){
 	{
 		std::cout << "Groups[" << i << "]: ";
 		for (size_t j = 0; j < _groups[i].size(); j++)
-		{
 			std::cout << _groups[i][j] << " ";
-
-		}
 	}
 	std::cout << std::endl;
 }
@@ -439,10 +406,7 @@ void PmergeMe<Container>::printWhatever(Groups &g){
 	{
 		std::cout << "g[" << i << "]: ";
 		for (size_t j = 0; j < g[i].size(); j++)
-		{
 			std::cout << g[i][j] << " ";
-
-		}
 	}
 	std::cout << std::endl;
 }
@@ -489,5 +453,19 @@ void PmergeMe<Container>::printSorted()
 }
 
 template <template <typename, typename > class Container>
-PmergeMe<Container>::~PmergeMe(){}
+void    PmergeMe<Container>::printClock(clock_t start, clock_t end, std::string type){
+	double us = static_cast<double>(end - start)
+* 1000000.0 / CLOCKS_PER_SEC;
 
+	std::cout << "Time to process a range of "
+			  << _input.size()
+			  << " elements with "
+			  << type
+			  << " : "
+			  << us
+			  << " us"
+			  << std::endl;
+}
+
+template <template <typename, typename > class Container>
+PmergeMe<Container>::~PmergeMe(){}
