@@ -14,8 +14,8 @@ private:
 	typedef Container<unsigned int, std::allocator<unsigned int> > Vec;
 	typedef Container<Vec, std::allocator<Vec> > Groups;
 
-	Vec _rest;
 	bool _asRest;
+	Vec _rest;
 
 	Vec _input;
 	Vec _sorted;
